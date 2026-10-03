@@ -1,0 +1,20 @@
+# All paths are relative to the working directory. Environment overrides TOML;
+# -account overrides EXTRACTOR_ACCOUNT. No .env file is loaded implicitly.
+# account = "5511900000001" # Optional when exactly one device is paired.
+database = "data/session.db"
+# messages_database = "postgres://user:password@localhost/extractor?sslmode=require"
+# Prefer EXTRACTOR_MESSAGES_DATABASE for credentials.
+store = "sql" # sql, jsonl, memory
+view = "log" # log (metadata only), json (full content), none
+buffer_size = 10000
+jsonl_path = "data/messages_{account}.jsonl"
+
+# Empty watches everything; chat OR sender accepts a message.
+[watchlist]
+chats = []
+senders = []
+
+# An account watchlist replaces the global watchlist, including when empty.
+# [accounts."5511900000001".watchlist]
+# chats = ["120363000000000001@g.us"]
+# senders = ["5511900000002"]

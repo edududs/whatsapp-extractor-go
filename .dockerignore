@@ -1,0 +1,10 @@
+.git
+bin
+dist
+data
+*.db
+*.db-*
+*.jsonl
+.env*
+extractor.toml
+coverage.*

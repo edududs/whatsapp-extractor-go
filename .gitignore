@@ -1,0 +1,14 @@
+/bin/
+/dist/
+/data/
+/extractor.toml
+.env
+.env.*
+!.env.example
+*.db
+*.db-*
+*.sqlite*
+*.jsonl
+*.test
+coverage.out
+coverage.html

@@ -1,0 +1,33 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version-file: go.mod
+      - run: go test -race ./...
+      - run: go vet ./...
+      - run: go tool staticcheck ./...
+      - run: go tool govulncheck ./...
+      - name: Build and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ github.ref_name }}
+        run: |
+          mkdir -p dist
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            suffix=''
+            if [[ ${target%/*} == windows ]]; then suffix='.exe'; fi
+            GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X main.version=$VERSION" -o "dist/whatsapp-extractor-go-${target%/*}-${target#*/}$suffix" ./cmd/whatsapp-extractor-go
+          done
+          (cd dist && sha256sum whatsapp-extractor-go-* > SHA256SUMS)
+          gh release create "$VERSION" dist/* --verify-tag --generate-notes
