@@ -40,7 +40,11 @@ func Open(ctx context.Context, address string) (*sql.DB, string, error) {
 			if err = f.Close(); err != nil {
 				return nil, "", err
 			}
-			address = (&url.URL{Scheme: "file", Path: path}).String()
+			uriPath := filepath.ToSlash(path)
+			if !strings.HasPrefix(uriPath, "/") {
+				uriPath = "/" + uriPath // Windows drive letters need file:///C:/..., not a URI host.
+			}
+			address = (&url.URL{Scheme: "file", Path: uriPath}).String()
 		}
 		address += "?_pragma=foreign_keys(1)&_pragma=busy_timeout(10000)&_pragma=journal_mode(WAL)"
 	}
